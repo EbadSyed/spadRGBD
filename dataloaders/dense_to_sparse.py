@@ -1,6 +1,9 @@
 import numpy as np
 import cv2
 
+from matplotlib import pyplot as plt
+import skimage.io as io
+
 
 def rgb2grayscale(rgb):
     return rgb[:, :, 0] * 0.2989 + rgb[:, :, 1] * 0.587 + rgb[:, :, 2] * 0.114
@@ -32,15 +35,29 @@ class UniformSampling(DenseToSparse):
         Only pixels with a maximum depth of `max_depth` are considered.
         If no `max_depth` is given, samples in all pixels
         """
-        mask_keep = depth > 0
-        if self.max_depth is not np.inf:
-            mask_keep = np.bitwise_and(mask_keep, depth <= self.max_depth)
-        n_keep = np.count_nonzero(mask_keep)
-        if n_keep == 0:
-            return mask_keep
-        else:
-            prob = float(self.num_samples) / n_keep
-            return np.bitwise_and(mask_keep, np.random.uniform(0, 1, depth.shape) < prob)
+        vert = int(depth.shape[0]/self.num_samples)
+        horz = int(depth.shape[1] / self.num_samples)
+
+        sparse_array = np.zeros(depth.shape,dtype=int)
+
+        for x in range(20):
+            for y in range(20):
+                sparse_array[int(x * vert), int(y * horz)] = depth[x * vert, y * horz]
+
+        return sparse_array
+        # mask_keep = depth > 0
+        # if self.max_depth is not np.inf:
+        #     mask_keep = np.bitwise_and(mask_keep, depth <= self.max_depth)
+        # n_keep = np.count_nonzero(mask_keep)
+        # if n_keep == 0:
+        #     io.imshow(mask_keep, interpolation='nearest')
+        #     io.show()
+        #     return mask_keep
+        # else:
+        #     prob = float(self.num_samples) / n_keep
+        #     io.imshow(np.bitwise_and(mask_keep, np.random.uniform(0, 1, depth.shape) < prob), interpolation='nearest')
+        #     io.show()
+        #     return np.bitwise_and(mask_keep, np.random.uniform(0, 1, depth.shape) < prob)
 
 
 class SimulatedStereo(DenseToSparse):
