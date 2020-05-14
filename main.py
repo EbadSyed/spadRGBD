@@ -14,6 +14,9 @@ from dataloaders.dense_to_sparse import UniformSampling, SimulatedStereo
 import criteria
 import utils
 
+import skimage.io as io
+import matplotlib.pyplot as plt
+
 args = utils.parse_command()
 print(args)
 
@@ -36,8 +39,8 @@ def create_data_loaders(args):
     max_depth = args.max_depth if args.max_depth >= 0.0 else np.inf
     if args.sparsifier == UniformSampling.name:
         sparsifier = UniformSampling(num_samples=args.num_samples, max_depth=max_depth)
-    elif args.sparsifier == SimulatedStereo.name:
-        sparsifier = SimulatedStereo(num_samples=args.num_samples, max_depth=max_depth)
+    # elif args.sparsifier == SimulatedStereo.name:
+    #     sparsifier = SimulatedStereo(num_samples=args.num_samples, max_depth=max_depth)
 
     if args.data == 'nyudepthv2':
         from dataloaders.nyu_dataloader import NYUDataset
@@ -231,6 +234,8 @@ def validate(val_loader, model, epoch, write_to_file=True):
     model.eval() # switch to evaluate mode
     end = time.time()
     for i, (input, target) in enumerate(val_loader):
+        # io.imshow(np.squeeze(input[:,3:,:,:].cpu().numpy()), interpolation='nearest')
+        # io.show()
         input, target = input.cuda(), target.cuda()
         torch.cuda.synchronize()
         data_time = time.time() - end

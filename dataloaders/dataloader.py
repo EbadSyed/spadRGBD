@@ -5,7 +5,11 @@ import torch.utils.data as data
 import h5py
 import dataloaders.transforms as transforms
 
+import skimage.io as io
+
 IMG_EXTENSIONS = ['.h5',]
+
+num_samples_eval = 20
 
 def is_image_file(filename):
     return any(filename.endswith(extension) for extension in IMG_EXTENSIONS)
@@ -78,12 +82,16 @@ class MyDataloader(data.Dataset):
 
     def create_sparse_depth(self, rgb, depth):
         if self.sparsifier is None:
+            print('none')
             return depth
         else:
-            mask_keep = self.sparsifier.dense_to_sparse(rgb, depth)
-            sparse_depth = np.zeros(depth.shape)
-            sparse_depth[mask_keep] = depth[mask_keep]
-            return sparse_depth
+            return self.sparsifier.dense_to_sparse(rgb,depth)
+            # mask_keep = self.sparsifier.dense_to_sparse(rgb, depth)
+            # io.imshow(mask_keep, interpolation='nearest')
+            # io.show()
+            # sparse_depth = np.zeros(depth.shape)
+            # sparse_depth[mask_keep] = depth[mask_keep]
+            # return sparse_depth
 
     def create_rgbd(self, rgb, depth):
         sparse_depth = self.create_sparse_depth(rgb, depth)

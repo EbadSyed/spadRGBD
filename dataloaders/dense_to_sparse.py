@@ -40,10 +40,12 @@ class UniformSampling(DenseToSparse):
 
         sparse_array = np.zeros(depth.shape,dtype=int)
 
-        for x in range(20):
-            for y in range(20):
+        for x in range(self.num_samples):
+            for y in range(self.num_samples):
                 sparse_array[int(x * vert), int(y * horz)] = depth[x * vert, y * horz]
 
+        # io.imshow(sparse_array,interpolation='nearest')
+        # io.show()
         return sparse_array
         # mask_keep = depth > 0
         # if self.max_depth is not np.inf:
