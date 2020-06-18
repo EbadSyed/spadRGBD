@@ -255,9 +255,12 @@ def validate(val_loader, model, epoch, write_to_file=True):
         average_meter.update(result, gpu_time, data_time, input.size(0))
         end = time.time()
 
+
         if args.modality == 'rgbd':
 
-            fig = plt.figure(4,12)
+            fig = plt.figure()
+
+            fig.suptitle('This is a somewhat long figure title', fontsize=16)
 
             rgb1 = 255 * np.transpose(np.squeeze(input[:,:3,:,:].cpu().numpy()), (1, 2, 0))  # H, W, C
             rgb1 = Image.fromarray(rgb1.astype('uint8'))
@@ -265,28 +268,24 @@ def validate(val_loader, model, epoch, write_to_file=True):
             plt.title("RGB")
             plt.axis('off')
             plt.imshow(rgb1)
-            plt.show()
 
             plt.subplot(222)
             plt.title("SPARSE")
             plt.axis('off')
             plt.imshow(np.squeeze(input[:, 3:, :, :].cpu().numpy()), interpolation='nearest')
-            plt.show()
 
             plt.subplot(223)
             plt.title("TARGET")
             plt.axis('off')
             plt.imshow(np.squeeze(target.cpu().numpy()), interpolation='nearest')
-            plt.show()
 
             plt.subplot(224)
             plt.title("PREDICTED")
             plt.axis('off')
             plt.imshow(np.squeeze(pred.cpu().numpy()), interpolation='nearest')
-            plt.show()
 
-            #plt.waitforbuttonpress()
-            fig.close()
+            plt.waitforbuttonpress(timeout=2)
+            plt.close()
 
 
         # save 8 images for visualization
