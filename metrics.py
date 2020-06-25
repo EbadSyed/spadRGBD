@@ -2,6 +2,8 @@ import torch
 import math
 import numpy as np
 
+from scipy.stats import pearsonr
+
 def log10(x):
     """Convert a new tensor with the base-10 logarithm of the elements of x. """
     return torch.log(x) / math.log(10)
@@ -13,6 +15,7 @@ class Result(object):
         self.absrel, self.lg10 = 0, 0
         self.delta1, self.delta2, self.delta3 = 0, 0, 0
         self.data_time, self.gpu_time = 0, 0
+
 
     def set_to_worst(self):
         self.irmse, self.imae = np.inf, np.inf
@@ -34,7 +37,6 @@ class Result(object):
         target = target[valid_mask]
 
         abs_diff = (output - target).abs()
-
         self.mse = float((torch.pow(abs_diff, 2)).mean())
         self.rmse = math.sqrt(self.mse)
         self.mae = float(abs_diff.mean())
