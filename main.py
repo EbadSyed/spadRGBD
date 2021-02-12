@@ -21,6 +21,7 @@ matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
 from PIL import Image
+from time import sleep
 
 cudnn.benchmark = True
 args = utils.parse_command()
@@ -265,7 +266,35 @@ def validate(val_loader, model, epoch, write_to_file=True):
         average_meter.update(result, gpu_time, data_time, input.size(0))
         end = time.time()
 
+        if args.modality == 'd':
+
+            plt.subplot(131)
+            plt.title("SPARSE")
+            plt.axis('off')
+            plt.imshow(np.squeeze(input.cpu().numpy()), interpolation='nearest')
+
+            plt.subplot(132)
+            plt.title("TARGET")
+            plt.axis('off')
+            plt.imshow(np.squeeze(target.cpu().numpy()), interpolation='nearest')
+
+            plt.subplot(133)
+            plt.title("PREDICTED")
+            plt.axis('off')
+            plt.imshow(np.squeeze(pred.cpu().numpy()), interpolation='nearest')
+            plt.colorbar(fraction=0.1, pad=0.04)
+
+            # plt.waitforbuttonpress(timeout=2)
+            # plt.close()
+
+            plt.waitforbuttonpress()
+            plt.close()
+
         if args.modality == 'rgbd':
+            sparse = np.squeeze(input[:, 3:, :, :].cpu().numpy())
+            print(sparse.shape)
+            sleep(3)
+
             fig = plt.figure(figsize=[40.0, 30.0])
 
             fig.suptitle('Error Percentage ' + str(round(result.absrel * 100, 2)) + ' GPU TIME ' + str(round(gpu_time,2)) + '   FPS ' + str(round(60.0 / (gpu_time + data_time),2)), fontsize=16)
@@ -293,7 +322,10 @@ def validate(val_loader, model, epoch, write_to_file=True):
             plt.imshow(np.squeeze(pred.cpu().numpy()), interpolation='nearest')
             plt.colorbar(fraction=0.1, pad=0.04)
 
-            plt.waitforbuttonpress(timeout=2)
+            # plt.waitforbuttonpress(timeout=2)
+            # plt.close()
+
+            plt.waitforbuttonpress()
             plt.close()
 
         # save 8 images for visualization
