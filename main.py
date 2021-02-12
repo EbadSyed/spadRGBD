@@ -14,6 +14,10 @@ import criteria
 import utils
 
 import skimage.io as io
+#import matplotlib.pyplot as plt
+
+import matplotlib
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
 from PIL import Image
@@ -83,6 +87,8 @@ def create_data_loaders(args):
 
 def main():
     global args, best_result, output_directory, train_csv, test_csv
+
+    torch.cuda.empty_cache()
 
     # evaluation mode
     start_epoch = 0
