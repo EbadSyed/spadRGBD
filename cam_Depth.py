@@ -10,7 +10,7 @@ This example shows how to use T265 intrinsics and extrinsics in OpenCV to
 asynchronously compute depth maps from T265 fisheye images on the host.
 T265 is not a depth camera and the quality of passive-only depth options will
 always be limited compared to (e.g.) the D4XX series cameras. However, T265 does
-have two global shutter cameras in a stereo configuration, and in this example
+have two global shutter cameras in a stereo configuration, and in this `example`
 we show how to set up OpenCV to undistort the images and compute stereo depth
 from them.
 Getting started with python3, OpenCV and T265 on Ubuntu 16.04:

@@ -267,6 +267,9 @@ def validate(val_loader, model, epoch, write_to_file=True):
         end = time.time()
 
         if args.modality == 'd':
+            fig = plt.figure()
+            fig.suptitle('Error Percentage ' + str(round(result.absrel * 100, 2)) + ' GPU TIME ' + str(
+                round(gpu_time, 2)) + '   FPS ' + str(round(60.0 / (gpu_time + data_time), 2)), fontsize=16)
 
             plt.subplot(131)
             plt.title("SPARSE")
@@ -277,6 +280,7 @@ def validate(val_loader, model, epoch, write_to_file=True):
             plt.title("TARGET")
             plt.axis('off')
             plt.imshow(np.squeeze(target.cpu().numpy()), interpolation='nearest')
+            plt.colorbar(fraction=0.1, pad=0.04)
 
             plt.subplot(133)
             plt.title("PREDICTED")
@@ -291,11 +295,11 @@ def validate(val_loader, model, epoch, write_to_file=True):
             plt.close()
 
         if args.modality == 'rgbd':
-            sparse = np.squeeze(input[:, 3:, :, :].cpu().numpy())
-            print(sparse.shape)
-            sleep(3)
+            # sparse = np.squeeze(input[:, 3:, :, :].cpu().numpy())
+            # print(sparse.shape)
+            # sleep(3)
 
-            fig = plt.figure(figsize=[40.0, 30.0])
+            fig = plt.figure()
 
             fig.suptitle('Error Percentage ' + str(round(result.absrel * 100, 2)) + ' GPU TIME ' + str(round(gpu_time,2)) + '   FPS ' + str(round(60.0 / (gpu_time + data_time),2)), fontsize=16)
 
@@ -315,6 +319,7 @@ def validate(val_loader, model, epoch, write_to_file=True):
             plt.title("TARGET")
             plt.axis('off')
             plt.imshow(np.squeeze(target.cpu().numpy()), interpolation='nearest')
+            plt.colorbar(fraction=0.1, pad=0.04)
 
             plt.subplot(224)
             plt.title("PREDICTED")
