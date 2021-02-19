@@ -36,6 +36,8 @@ fieldnames = ['mse', 'rmse', 'absrel', 'lg10', 'mae',
 best_result = Result()
 best_result.set_to_worst()
 
+torch.set_printoptions(profile="full")
+
 
 def create_data_loaders(args):
     # Data loading code
@@ -252,6 +254,7 @@ def validate(val_loader, model, epoch, write_to_file=True):
     for i, (input, target) in enumerate(val_loader):
         # io.imshow(np.squeeze(input[:,3:,:,:].cpu().numpy()), interpolation='nearest')
         # io.show()
+        #print(input.size())
         input, target = input.cuda(), target.cuda()
         torch.cuda.synchronize()
         data_time = time.time() - end
