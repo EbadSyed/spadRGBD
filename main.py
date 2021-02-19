@@ -340,7 +340,7 @@ def validate(val_loader, model, epoch, write_to_file=True):
 
                 plt.waitforbuttonpress()
                 plt.close()
-
+#
         # save 8 images for visualization
         skip = 50
         if args.modality == 'd':
