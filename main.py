@@ -24,7 +24,7 @@ import matplotlib.pyplot as plt
 from PIL import Image
 from time import sleep
 
-visualize = False  # set to false if visualization not required
+visualize = True  # set to false if visualization not required
 
 cudnn.benchmark = True
 args = utils.parse_command()
@@ -279,12 +279,12 @@ def validate(val_loader, model, epoch, write_to_file=True):
                     round(gpu_time, 2)) + '   FPS ' + str(round(60.0 / (gpu_time + data_time), 2)), fontsize=16)
 
                 plt.subplot(131)
-                plt.title("SPARSE")
+                plt.title("SPARSE (Input)")
                 plt.axis('off')
                 plt.imshow(np.squeeze(input.cpu().numpy()), interpolation='nearest')
 
                 plt.subplot(132)
-                plt.title("TARGET")
+                plt.title("TARGET (Ground Truth)")
                 plt.axis('off')
                 plt.imshow(np.squeeze(target.cpu().numpy()), interpolation='nearest')
                 plt.colorbar(fraction=0.1, pad=0.04)
@@ -314,17 +314,17 @@ def validate(val_loader, model, epoch, write_to_file=True):
                 rgb1 = 255 * np.transpose(np.squeeze(input[:, :3, :, :].cpu().numpy()), (1, 2, 0))  # H, W, C
                 rgb1 = Image.fromarray(rgb1.astype('uint8'))
                 plt.subplot(221)
-                plt.title("RGB")
+                plt.title("RGB (Input)")
                 plt.axis('off')
                 plt.imshow(rgb1)
 
                 plt.subplot(222)
-                plt.title("SPARSE")
+                plt.title("SPARSE (Input)")
                 plt.axis('off')
                 plt.imshow(np.squeeze(input[:, 3:, :, :].cpu().numpy()), interpolation='nearest')
 
                 plt.subplot(223)
-                plt.title("TARGET")
+                plt.title("TARGET (Ground Truth)")
                 plt.axis('off')
                 plt.imshow(np.squeeze(target.cpu().numpy()), interpolation='nearest')
                 plt.colorbar(fraction=0.1, pad=0.04)

@@ -58,7 +58,6 @@ def dense_to_sparse(depth):
     Only pixels with a maximum depth of `max_depth` are considered.
     If no `max_depth` is given, samples in all pixels
     """
-    print("Depth Type", type(depth), depth.size, depth.shape[0])
 
     vert = int(depth.shape[0] / 20)
     horz = int(depth.shape[1] / 20)
@@ -116,7 +115,6 @@ depth_tensor = to_tensor(depth_sparse)
 depth_tensor = depth_tensor.unsqueeze(0)
 depth_tensor = depth_tensor.unsqueeze(0)
 
-print(depth_tensor.size())
 if rgbdMode:
     input = input_tensor.cuda()
 else:
