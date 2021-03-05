@@ -96,23 +96,30 @@ while True:
         for y in range(area4):
             a4[x + diff4, y + diff4] = x4
 
-    plt.subplot(221)
-    plt.imshow(a1)
-    plt.colorbar(fraction=0.1, pad=0.04)
+    # plt.subplot(221)
+    # plt.imshow(a1)
+    # plt.colorbar(fraction=0.1, pad=0.04)
+    #
+    # plt.subplot(222)
+    # plt.imshow(a2)
+    # plt.colorbar(fraction=0.1, pad=0.04)
+    #
+    # plt.subplot(223)
+    # plt.imshow(a3)
+    # plt.colorbar(fraction=0.1, pad=0.04)
+    #
+    # plt.subplot(224)
+    # plt.imshow(a4)
+    # plt.colorbar(fraction=0.1, pad=0.04)
 
-    plt.subplot(222)
-    plt.imshow(a2)
-    plt.colorbar(fraction=0.1, pad=0.04)
+    a1a2 = np.concatenate([a1, a2], axis=1)
+    a3a4 = np.concatenate([a3, a4], axis=1)
 
-    plt.subplot(223)
-    plt.imshow(a3)
-    plt.colorbar(fraction=0.1, pad=0.04)
+    result = np.concatenate([a1a2,a3a4])
 
-    plt.subplot(224)
-    plt.imshow(a4)
+    plt.imshow(result,cmap='magma',vmin=10,vmax=113)
     plt.colorbar(fraction=0.1, pad=0.04)
-
-    plt.waitforbuttonpress(timeout=0.5)
+    plt.waitforbuttonpress()
     plt.close()
 
 
