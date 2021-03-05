@@ -1,11 +1,21 @@
 import serial
+import numpy as np
+import matplotlib
+matplotlib.use('TkAgg')
+import matplotlib.pyplot as plt
+
+from time import sleep
 
 ser = serial.Serial('/dev/ttyACM0')
 ser.baudrate=115200
+ser.timeout = 1
 
 tanTheta = 0.4434
 
 while True:
+    ser.flushInput()
+    ser.flushOutput()
+    sleep(0.2)
     ser_bytes = ser.readline()
     ser_string = ser_bytes.decode("utf-8")
     ser_list = ser_string.split(",")
@@ -38,10 +48,72 @@ while True:
     else:
         x4 = 113
 
-    y1 = int(x1 * tanTheta)
-    y2 = int(x2 * tanTheta)
-    y3 = int(x3 * tanTheta)
-    y4 = int(x4 * tanTheta)
+    area1 = int(x1 * tanTheta)
+    a1 = np.full((50, 50), 113)
 
-    print(x1,x2,x3,x4)
-    print(y1,y2,y3,y4)
+    if area1 % 2 != 0:
+        area1 = area1 + 1
+
+    diff1 = int((50 - area1) / 2)
+
+    for x in range(area1):
+        for y in range(area1):
+            a1[x + diff1, y + diff1] = x1
+
+    area2 = int(x2 * tanTheta)
+    a2 = np.full((50, 50), 113)
+
+    if area2 % 2 != 0:
+        area2 = area2 + 1
+
+    diff2 = int((50 - area2) / 2)
+
+    for x in range(area2):
+        for y in range(area2):
+            a2[x + diff2, y + diff2] = x2
+
+    area3 = int(x3 * tanTheta)
+    a3 = np.full((50, 50), 113)
+
+    if area3 % 2 != 0:
+        area3 = area3 + 1
+
+    diff3 = int((50 - area3) / 2)
+
+    for x in range(area3):
+        for y in range(area3):
+            a3[x + diff3, y + diff3] = x3
+
+    area4 = int(x4 * tanTheta)
+    a4 = np.full((50, 50), 113)
+
+    if area4 % 2 != 0:
+        area4 = area4 + 1
+
+    diff4 = int((50 - area4) / 2)
+
+    for x in range(area4):
+        for y in range(area4):
+            a4[x + diff4, y + diff4] = x4
+
+    plt.subplot(221)
+    plt.imshow(a1)
+    plt.colorbar(fraction=0.1, pad=0.04)
+
+    plt.subplot(222)
+    plt.imshow(a2)
+    plt.colorbar(fraction=0.1, pad=0.04)
+
+    plt.subplot(223)
+    plt.imshow(a3)
+    plt.colorbar(fraction=0.1, pad=0.04)
+
+    plt.subplot(224)
+    plt.imshow(a4)
+    plt.colorbar(fraction=0.1, pad=0.04)
+
+    plt.waitforbuttonpress(timeout=0.5)
+    plt.close()
+
+
+
