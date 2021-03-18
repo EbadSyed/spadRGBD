@@ -35,18 +35,18 @@ def exit_handler(signal, frame):
 signal.signal(signal.SIGINT, exit_handler)
 
 roi = []
-i = 0
 
 for x in range(5):
     for y in range(5):
-        roi[i] =  VL53L1X.VL53L1xUserRoi((3*x), (15 - 3 * y), (3 * x + 3), (15 - 3 * y - 3))
+        roi.append(VL53L1X.VL53L1xUserRoi((3*x), (15 - 3 * y), (3 * x + 3), (15 - 3 * y - 3)))
         print(3*x)
         print(15 - 3 * y)
         print((3 * x + 3))
         print(15 - 3 * y - 3)
         print("----")
 
-        i = i+1
+print(len(roi))
+print(roi[4])
 
 
 while running:
