@@ -1,16 +1,41 @@
 import serial
+import os
+import torch.optim
 import numpy as np
-import matplotlib
-matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
+import dataloaders.transforms as transforms
 
-from time import sleep
+model_path = '/home/ebad/sparse-to-dense.pytorch/results/d20/model_best.pth.tar'
 
 ser = serial.Serial('/dev/ttyACM0')
-ser.baudrate=115200
+ser.baudrate = 115200
 ser.timeout = 1
 
 tanTheta = 0.4434
+
+iheight, iwidth = 630, 630  # raw image size
+output_size = (228, 304)
+
+transform = transforms.Compose([
+    transforms.Resize(240.0 / iheight),
+    transforms.CenterCrop(output_size),
+])
+
+baseMat = np.zeros((5,5))
+
+np.set_printoptions(threshold=np.inf)
+
+to_tensor = transforms.ToTensor()
+
+assert os.path.isfile(model_path), "=> no best model found at '{}'".format(model_path)
+print("=> loading best model '{}'".format(model_path))
+checkpoint = torch.load(model_path)
+output_directory = os.path.dirname(model_path)
+args = checkpoint['args']
+start_epoch = checkpoint['epoch'] + 1
+best_result = checkpoint['best_result']
+model = checkpoint['model']
+print("=> loaded best model (epoch {})".format(checkpoint['epoch']))
 
 while True:
     ser.flushInput()
@@ -20,104 +45,74 @@ while True:
     ser_string = ser_bytes.decode("utf-8")
     ser_list = ser_string.split(",")
 
-
-    if int(ser_list[0]) == 0:
-        x1 = int(ser_list[1])
-        if x1 > 113:
+    try:
+        if int(ser_list[0]) == 0:
+            x1 = int(ser_list[1])
+            if x1 > 113:
+                x1 = 113
+        else:
             x1 = 113
-    else:
-        x1 = 113
 
-    if ser_list[2] == '0':
-        x2 = int(ser_list[3])
-        if x2 > 113:
+        if ser_list[2] == '0':
+            x2 = int(ser_list[3])
+            if x2 > 113:
+                x2 = 113
+        else:
             x2 = 113
-    else:
-        x2 = 113
 
-    if ser_list[4] == '0':
-        x3 = int(ser_list[5])
-        if x3 > 113:
+        if ser_list[4] == '0':
+            x3 = int(ser_list[5])
+            if x3 > 113:
+                x3 = 113
+        else:
             x3 = 113
-    else:
-        x3 = 113
 
-    if ser_list[6] == '0':
-        x4 = int(ser_list[7])
-        if x4 > 113:
+        if ser_list[6] == '0':
+            x4 = int(ser_list[7])
+            if x4 > 113:
+                x4 = 113
+        else:
             x4 = 113
-    else:
-        x4 = 113
 
-    area1 = int((x1 * tanTheta)/10)
+        data = np.zeros((228,304))
 
-    if area1 == 0:
-        area1 = 1
+        data[57, 76] = x2
+        data[171, 76] = x1
+        data[57, 228] = x4
+        data[171, 228] = x3
 
-    a1 = np.full((5, 5), 113)
+        depth_tensor = to_tensor(data)
+        depth_tensor = depth_tensor.unsqueeze(0)
+        depth_tensor = depth_tensor.unsqueeze(0)
 
-    diff1 = int((5 - area1) / 2)
+        input = depth_tensor.cuda()
 
-    for x in range(area1):
-        for y in range(area1):
-            a1[x + diff1, y + diff1] = x1
+        torch.cuda.synchronize()
 
-    area2 = int((x2 * tanTheta)/10)
+        with torch.no_grad():
+            pred = model(input)
 
-    if area2 == 0:
-        area2 = 1
+        torch.cuda.synchronize()
 
-    a2 = np.full((5, 5), 113)
+        pred = np.squeeze(pred.cpu().numpy())
+        print(pred.shape)
+        a1 = pred[51:63, 70:82]
+        print(a1.shape)
+        a2 = pred[165:177, 70:82]
+        print(a2.shape)
+        a3 = pred[51:63, 170:182]
+        print(a3.shape)
+        a4 = pred[165:177, 170:182]
+        print(a4.shape)
 
-    diff2 = int((5 - area2) / 2)
+        a1a2 = np.concatenate([a1, a2], axis=1)
+        a3a4 = np.concatenate([a3, a4], axis=1)
 
-    print("Area + Diff :" + str(area2) + " " + str(diff2))
+        result_combined = np.concatenate([a1a2, a3a4])
 
-    for x in range(area2):
-        for y in range(area2):
-            a2[x + diff2, y + diff2] = x2
-
-    area3 = int((x3 * tanTheta)/10)
-
-    if area3 == 0:
-        area3 = 1
-
-    a3 = np.full((5, 5), 113)
-
-    diff3 = int((5 - area3) / 2)
-
-    for x in range(area3):
-        for y in range(area3):
-            a3[x + diff3, y + diff3] = x3
-
-    area4 = int((x4 * tanTheta)/10)
-
-    if area4 == 0:
-        area4 = 1
-
-    a4 = np.full((5, 5), 113)
-
-    diff4 = int((5 - area4) / 2)
-
-    for x in range(area4):
-        for y in range(area4):
-            a4[x + diff4, y + diff4] = x4
-
-
-    a1a2 = np.concatenate([a2, a1], axis=1)
-    a3a4 = np.concatenate([a4, a3], axis=1)
-
-    result = np.concatenate([a1a2, a3a4])
-    result = np.delete(result, 0, 0)
-    result = np.delete(result, 8, 0)
-    result = np.delete(result, 0, 1)
-    result = np.delete(result, 8, 1)
-
-
-    plt.imshow(result, cmap='magma', vmin=10, vmax=113)
-    plt.colorbar(fraction=0.1, pad=0.04)
-    plt.waitforbuttonpress()
-    plt.close()
-
-
-
+        plt.imshow(pred, cmap='magma', vmin=10, vmax=113)
+        plt.colorbar(fraction=0.1, pad=0.04)
+        plt.waitforbuttonpress()
+        plt.close()
+    except:
+        print("Input Garbage")
