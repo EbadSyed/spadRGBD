@@ -27,9 +27,9 @@ signal.signal(signal.SIGINT, exit_handler)
 # Sets Distance Mode Short=1 Long=2
 tof.set_distance_mode(2)
 
-data = np.zeros((1, 2), dtype=np.uint8 )
+data = np.zeros((1, 2), dtype=np.uint16 )
 
-center = [167, 231]
+center = [151, 239]
 
 #
 # fig = plt.figure()
@@ -42,9 +42,12 @@ center = [167, 231]
 
 
 #def animate(iter):
+print(tof.set_roi_size(4, 16))
+print(tof.set_roi_center(167))
+
 while True:
     for x in range(2):
-        tof.set_roi_size(8, 16)
+        tof.set_roi_size(4, 16)
         time.sleep(.005)
         tof.set_roi_center(center[x])
         time.sleep(.005)
