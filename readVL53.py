@@ -20,20 +20,6 @@ Press Ctrl+C to exit.
 tof = VL53L1X.VL53L1X(i2c_bus=1, i2c_address=0x29)
 tof.open()
 
-# Optionally set an explicit timing budget
-# These values are measurement time in microseconds,
-# and inter-measurement time in milliseconds.
-# If you uncomment the line below to set a budget you
-# should use `tof.start_ranging(0)`
-# tof.set_timing(66000, 70)
-
-tof.set_user_roi(VL53L1X.VL53L1xUserRoi(0, 0, 4, 4))
-tof.start_ranging(1)  # Start ranging
-                      # 0 = Unchanged
-                      # 1 = Short Range
-                      # 2 = Medium Range
-                      # 3 = Long Range
-
 running = True
 
 
@@ -49,6 +35,42 @@ def exit_handler(signal, frame):
 signal.signal(signal.SIGINT, exit_handler)
 
 while running:
-    distance_in_mm = tof.get_distance()
-    print("Distance: {}mm".format(distance_in_mm))
-    time.sleep(0.1)
+    tof.set_user_roi(VL53L1X.VL53L1xUserRoi(0, 0, 3, 3))
+    tof.start_ranging(1)
+    distance_in_mm1 = tof.get_distance()
+    tof.stop_ranging()
+
+    tof.set_user_roi(VL53L1X.VL53L1xUserRoi(4, 0, 7, 3))
+    tof.start_ranging(1)
+    distance_in_mm2 = tof.get_distance()
+    tof.stop_ranging()
+
+    tof.set_user_roi(VL53L1X.VL53L1xUserRoi(8, 0, 11, 3))
+    tof.start_ranging(1)
+    distance_in_mm3 = tof.get_distance()
+    tof.stop_ranging()
+
+    tof.set_user_roi(VL53L1X.VL53L1xUserRoi(12, 0, 15, 3))
+    tof.start_ranging(1)
+    distance_in_mm4 = tof.get_distance()
+    tof.stop_ranging()
+
+    tof.set_user_roi(VL53L1X.VL53L1xUserRoi(0, 4, 3, 7))
+    tof.start_ranging(1)
+    distance_in_mm5 = tof.get_distance()
+    tof.stop_ranging()
+
+    tof.set_user_roi(VL53L1X.VL53L1xUserRoi(4, 4, 7, 7))
+    tof.start_ranging(1)
+    distance_in_mm6 = tof.get_distance()
+    tof.stop_ranging()
+
+    tof.set_user_roi(VL53L1X.VL53L1xUserRoi(8, 4, 11, 7))
+    tof.start_ranging(1)
+    distance_in_mm7 = tof.get_distance()
+    tof.stop_ranging()
+
+    print(str(distance_in_mm1) + " " + str(distance_in_mm2)+ " " + str(distance_in_mm3)+ " " + str(distance_in_mm4)+ " " + str(distance_in_mm5))
+
+    #print("Distance: {}mm".format(distance_in_mm))
+    #time.sleep(0.1)
