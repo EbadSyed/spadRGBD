@@ -29,25 +29,27 @@ signal.signal(signal.SIGINT, exit_handler)
 
 roi = []
 
+for y in range(4):
+    for x in range(4):
+        roi.append(VL53L1X.VL53L1xUserRoi(x*4, 15 - y*4, x*4+3, 15 - 3 - y*4))
 
-roi.append(VL53L1X.VL53L1xUserRoi((3 * x1), (15 - 3 * y1), (3 * x1 + 3), (15 - 3 * y1 - 3)))
 
 fig = plt.figure()
-data = np.zeros((5, 5))
+data = np.zeros((4, 4))
 im = plt.imshow(data,cmap='magma',vmin=0,vmax=2400)
 plt.colorbar(fraction=0.1, pad=0.04)
 
 
 def init():
-    im.set_data(np.zeros((5, 5)))
+    im.set_data(np.zeros((4, 4)))
 
 
 def animate(iter):
 
     i = 0
 
-    for x in range(5):
-        for y in range(5):
+    for x in range(4):
+        for y in range(4):
             tof.set_user_roi(roi[i])
             tof.start_ranging(0)
             data[x,y] = tof.get_distance()
