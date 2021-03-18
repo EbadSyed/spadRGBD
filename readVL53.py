@@ -25,7 +25,7 @@ def exit_handler(signal, frame):
 signal.signal(signal.SIGINT, exit_handler)
 
 # Sets Distance Mode Short=1 Long=2
-tof.set_distance_mode(1)
+tof.set_distance_mode(2)
 
 data = np.zeros((1, 2), dtype=np.uint8 )
 
@@ -50,9 +50,9 @@ def animate(iter):
         tof.start_ranging()
         time.sleep(.005)
         data[0, x] = tof.get_distance()
-        print(data[0, x])
         tof.stop_ranging()
 
+    print(data[0, 0],data[0, 1])
     im.set_data(data)
 
 
