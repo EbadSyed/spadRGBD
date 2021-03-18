@@ -34,7 +34,25 @@ def exit_handler(signal, frame):
 # Attach a signal handler to catch SIGINT (Ctrl+C) and exit gracefully
 signal.signal(signal.SIGINT, exit_handler)
 
+roi = []
+i = 0
+
+for x in range(5):
+    for y in range(5):
+        roi[i] =  VL53L1X.VL53L1xUserRoi((3*x), (15 - 3 * y), (3 * x + 3), (15 - 3 * y - 3))
+        print(3*x)
+        print(15 - 3 * y)
+        print((3 * x + 3))
+        print(15 - 3 * y - 3)
+        print("----")
+
+        i = i+1
+
+
 while running:
+
+
+
     tof.set_user_roi(VL53L1X.VL53L1xUserRoi(0, 0, 3, 3))
     tof.start_ranging(1)
     distance_in_mm1 = tof.get_distance()
