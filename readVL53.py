@@ -44,17 +44,22 @@ center = [151, 239]
 #def animate(iter):
 print(tof.set_roi_size(4, 16))
 print(tof.set_roi_center(167))
+time.sleep(2)
+tof.start_ranging()
+print("get roi" + str(tof.get_roi_xy()))
+time.sleep(3)
 
 while True:
     for x in range(2):
-        tof.set_roi_size(4, 16)
         time.sleep(.005)
         tof.set_roi_center(center[x])
-        time.sleep(.005)
-        tof.start_ranging()
-        time.sleep(.005)
+        dataReady = 0
+
+        while dataReady == 0:
+            dataReady = tof.check_for_data_ready()
+
         data[0, x] = tof.get_distance()
-        tof.stop_ranging()
+        tof.clear_interrupt()
 
     print(data[0, 0],data[0, 1])
 
