@@ -37,12 +37,11 @@ print(center)
 tof.set_roi_size(4, 4)
 
 # verify roi
-for ytest in range(4):
-    for xtest in range(4):
-        print(center[xtest, ytest])
-        print(tof.set_roi_center(center[xtest, ytest]))
-        print("get roi:  " + str(tof.get_roi_xy()))
-        time.sleep(0.3)
+# for ytest in range(4):
+#     for xtest in range(4):
+#         print(center[xtest, ytest])
+#         print(tof.set_roi_center(center[xtest, ytest]))
+#         time.sleep(0.3)
 
 
 # fig = plt.figure()
@@ -54,26 +53,22 @@ for ytest in range(4):
 #      im.set_data(np.zeros((2, 2), dtype=np.uint8))
 
 
-# print(tof.set_roi_center(167))
-# time.sleep(2)
-# tof.start_ranging()
-# print("get roi" + str(tof.get_roi_xy()))
-# time.sleep(3)
-#
-# while True:
-#     for y in range(4):
-#         for x in range(4):
-#             time.sleep(.005)
-#             tof.set_roi_center(center[x*y])
-#             dataReady = 0
-#
-#             while dataReady == 0:
-#                 dataReady = tof.check_for_data_ready()
-#
-#             data[x, y] = tof.get_distance()
-#             tof.clear_interrupt()
-#
-#     print(data[0, 0],data[0, 1])
+tof.start_ranging()
+
+while True:
+    start_time = time.time()
+    for y in range(4):
+        for x in range(4):
+            time.sleep(.005)
+            tof.set_roi_center(center[x, y])
+            dataReady = 0
+            while dataReady == 0:
+                dataReady = tof.check_for_data_ready()
+            data[x, y] = tof.get_distance()
+            tof.clear_interrupt()
+    print("Execution Time : " + str(time.time()-start_time))
+    print(data)
+
 
 
 # anim = animation.FuncAnimation(fig, animate, init_func=init)
