@@ -27,11 +27,24 @@ signal.signal(signal.SIGINT, exit_handler)
 # Sets Distance Mode Short=1 Long=2
 tof.set_distance_mode(2)
 
-data = np.zeros((1, 2), dtype=np.uint16 )
+data = np.zeros((4, 4), dtype=np.uint16 )
 
-center = [151, 239]
+center = np.array([(145, 177, 209, 241), (149, 181, 213, 245), (110, 78, 46, 14), (106, 74, 42, 18)])
 
-#
+print("Center ROI")
+print(center)
+
+tof.set_roi_size(4, 4)
+
+# verify roi
+for ytest in range(4):
+    for xtest in range(4):
+        print(center[xtest, ytest])
+        print(tof.set_roi_center(center[xtest, ytest]))
+        print("get roi:  " + str(tof.get_roi_xy()))
+        time.sleep(0.3)
+
+
 # fig = plt.figure()
 # im = plt.imshow(data, cmap='magma', vmin=0, vmax=2400)
 # plt.colorbar(fraction=0.1, pad=0.04)
@@ -41,27 +54,26 @@ center = [151, 239]
 #      im.set_data(np.zeros((2, 2), dtype=np.uint8))
 
 
-#def animate(iter):
-print(tof.set_roi_size(4, 16))
-print(tof.set_roi_center(167))
-time.sleep(2)
-tof.start_ranging()
-print("get roi" + str(tof.get_roi_xy()))
-time.sleep(3)
-
-while True:
-    for x in range(2):
-        time.sleep(.005)
-        tof.set_roi_center(center[x])
-        dataReady = 0
-
-        while dataReady == 0:
-            dataReady = tof.check_for_data_ready()
-
-        data[0, x] = tof.get_distance()
-        tof.clear_interrupt()
-
-    print(data[0, 0],data[0, 1])
+# print(tof.set_roi_center(167))
+# time.sleep(2)
+# tof.start_ranging()
+# print("get roi" + str(tof.get_roi_xy()))
+# time.sleep(3)
+#
+# while True:
+#     for y in range(4):
+#         for x in range(4):
+#             time.sleep(.005)
+#             tof.set_roi_center(center[x*y])
+#             dataReady = 0
+#
+#             while dataReady == 0:
+#                 dataReady = tof.check_for_data_ready()
+#
+#             data[x, y] = tof.get_distance()
+#             tof.clear_interrupt()
+#
+#     print(data[0, 0],data[0, 1])
 
 
 # anim = animation.FuncAnimation(fig, animate, init_func=init)
