@@ -45,7 +45,7 @@ tof.set_roi_size(4, 4)
 
 
 fig = plt.figure()
-im = plt.imshow(data, cmap='magma', vmin=0, vmax=2400)
+im = plt.imshow(data , vmin=0, vmax=2000)
 plt.colorbar(fraction=0.1, pad=0.04)
 
 
@@ -74,6 +74,7 @@ def animate(i):
             tof.stop_ranging()
     print("Execution Time : " + str(time.time()-start_time))
     start_time = time.time()
+    print(data)
     im.set_data(data)
 
 anim = animation.FuncAnimation(fig, animate, init_func=init)
