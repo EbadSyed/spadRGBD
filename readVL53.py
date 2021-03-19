@@ -44,32 +44,37 @@ tof.set_roi_size(4, 4)
 #         time.sleep(0.3)
 
 
-# fig = plt.figure()
-# im = plt.imshow(data, cmap='magma', vmin=0, vmax=2400)
-# plt.colorbar(fraction=0.1, pad=0.04)
+fig = plt.figure()
+im = plt.imshow(data, cmap='magma', vmin=0, vmax=2400)
+plt.colorbar(fraction=0.1, pad=0.04)
 
 
-# def init():
-#      im.set_data(np.zeros((2, 2), dtype=np.uint8))
+def init():
+     im.set_data(np.zeros((4, 4), dtype=np.uint16))
 
 
 tof.start_ranging()
 
-while True:
-    start_time = time.time()
+start_time = time.time()
+
+# while True:
+def animate(i):
+    global start_time
+
     for y in range(4):
         for x in range(4):
             time.sleep(.005)
             tof.set_roi_center(center[x, y])
+            tof.start_ranging()
             dataReady = 0
             while dataReady == 0:
                 dataReady = tof.check_for_data_ready()
             data[x, y] = tof.get_distance()
             tof.clear_interrupt()
+            tof.stop_ranging()
     print("Execution Time : " + str(time.time()-start_time))
-    print(data)
+    start_time = time.time()
+    im.set_data(data)
 
-
-
-# anim = animation.FuncAnimation(fig, animate, init_func=init)
-# plt.show()
+anim = animation.FuncAnimation(fig, animate, init_func=init)
+plt.show()
