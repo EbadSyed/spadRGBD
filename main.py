@@ -24,7 +24,7 @@ import matplotlib.pyplot as plt
 from PIL import Image
 from time import sleep
 
-visualize = True  # set to false if visualization not required
+visualize = False  # set to false if visualization not required
 
 cudnn.benchmark = True
 args = utils.parse_command()

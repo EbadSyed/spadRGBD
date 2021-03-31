@@ -43,6 +43,7 @@ class UniformSampling(DenseToSparse):
         for x in range(self.num_samples):
             for y in range(self.num_samples):
                 sparse_array[int(x * vert), int(y * horz)] = depth[x * vert, y * horz]
+                
 
         # io.imshow(sparse_array,interpolation='nearest')
         # io.show()
