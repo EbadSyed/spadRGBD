@@ -35,6 +35,10 @@ print("Center ROI")
 print(center)
 
 tof.set_roi_size(4, 4)
+# TimingBudgetInMs: Predefined values = 15, 20, 33, 50, 100 (**default**), 200, 500.
+tof.set_timing_budget_in_ms(20)
+# Intermeasurement period must be >/= timing budget
+tof.set_inter_measurement_in_ms(20)
 
 # verify roi
 # for ytest in range(4):
@@ -65,13 +69,13 @@ def animate(i):
         for x in range(4):
             time.sleep(.005)
             tof.set_roi_center(center[x, y])
-            tof.start_ranging()
+            #tof.start_ranging()
             dataReady = 0
             while dataReady == 0:
                 dataReady = tof.check_for_data_ready()
             data[x, y] = tof.get_distance()
             tof.clear_interrupt()
-            tof.stop_ranging()
+            #tof.stop_ranging()
     print("Execution Time : " + str(time.time()-start_time))
     start_time = time.time()
     print(data)
