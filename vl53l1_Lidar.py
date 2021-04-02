@@ -25,7 +25,7 @@ def exit_handler(signal, frame):
 signal.signal(signal.SIGINT, exit_handler)
 
 # Sets Distance Mode Short=1 Long=2
-tof.set_distance_mode(2)
+tof.set_distance_mode(1)
 
 data = np.zeros((4, 4), dtype=np.uint16 )
 
@@ -68,6 +68,7 @@ def animate(i):
     for y in range(4):
         for x in range(4):
             time.sleep(.005)
+            print(center[x,y])
             tof.set_roi_center(center[x, y])
             #tof.start_ranging()
             dataReady = 0
