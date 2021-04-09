@@ -65,11 +65,11 @@ start_time = time.time()
 def animate(i):
     global start_time
 
-    for y in range(4):
-        for x in range(4):
-            time.sleep(.005)
-            print(center[x,y])
+    for x in range(4):
+        for y in range(4):
             tof.set_roi_center(center[x, y])
+            print(center[x,y])
+            time.sleep(0.005)
             #tof.start_ranging()
             dataReady = 0
             while dataReady == 0:
@@ -80,6 +80,7 @@ def animate(i):
     print("Execution Time : " + str(time.time()-start_time))
     start_time = time.time()
     print(data)
+    print(center)
     im.set_data(data)
 
 anim = animation.FuncAnimation(fig, animate, init_func=init)
