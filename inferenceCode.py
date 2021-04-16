@@ -28,12 +28,12 @@ import dataloaders.transforms as transforms
 
 rgbdMode = False
 
-path1 = '/home/ebad/sparse-to-dense.pytorch/data/nyudepthv2/train/cafe_0001a/00001.h5'
+path1 = '/home/ebad/spadRGBD/data/nyudepthv2/train/cafe_0001a/00001.h5'
 
 if rgbdMode:
-    model_path = '/home/ebad/sparse-to-dense.pytorch/results/rgbd20/model_best.pth.tar'
+    model_path = '/home/ebad/spadRGBD/results/rgbd20/model_best.pth.tar'
 else:
-    model_path = '/home/ebad/sparse-to-dense.pytorch/results/d20/model_best.pth.tar'
+    model_path = '/home/ebad/spadRGBD/results/d20/model_best.pth.tar'
 
 
 iheight, iwidth = 480, 640  # raw image size
@@ -59,14 +59,21 @@ def dense_to_sparse(depth):
     If no `max_depth` is given, samples in all pixels
     """
 
-    vert = int(depth.shape[0] / 20)
-    horz = int(depth.shape[1] / 20)
+    vert = int(depth.shape[0] / 4)
+    horz = int(depth.shape[1] / 4)
 
+    if vert%2 != 0:
+        vert = vert - 1
+    if horz%2 != 0:
+        horz = horz - 1
+    print("Vertical",vert)
+    print("Horizontal", horz)
     sparse_array = np.zeros(depth.shape)
 
-    for x in range(20):
-        for y in range(20):
-            sparse_array[x * vert, y * horz] = depth[x * vert, y * horz]
+    for x in range(4):
+        for y in range(4):
+            print(x,y)
+            sparse_array[int(((x + 1) * vert) - vert/2), int(((y + 1) * horz) - horz/2)] = depth[int(((x + 1) * vert) - vert/2), int(((y + 1) * horz)/2)]
 
     return sparse_array
 

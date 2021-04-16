@@ -42,7 +42,7 @@ class UniformSampling(DenseToSparse):
 
         for x in range(self.num_samples):
             for y in range(self.num_samples):
-                sparse_array[int(x * vert), int(y * horz)] = depth[x * vert, y * horz]
+                sparse_array[int(((x + 1) * vert) - vert/2), int(((y + 1) * horz) - horz/2)] = depth[int(((x + 1) * vert) - vert/2), int(((y + 1) * horz)/2)]
                 
 
         # io.imshow(sparse_array,interpolation='nearest')
