@@ -29,7 +29,7 @@ tof.set_distance_mode(1)
 
 data = np.zeros((4, 4), dtype=np.uint16 )
 
-center = np.array([(145, 177, 209, 241), (149, 181, 213, 245), (110, 78, 46, 14), (106, 74, 42, 18)])
+center = np.array([(149, 178, 210, 242), (149, 181, 213, 245), (110, 78, 46, 14), (106, 74, 42, 18)])
 
 print("Center ROI")
 print(center)
@@ -65,11 +65,10 @@ start_time = time.time()
 def animate(i):
     global start_time
 
-    for y in range(4):
-        for x in range(4):
-            time.sleep(.005)
-            print(center[x,y])
+    for x in range(4):
+        for y in range(4):
             tof.set_roi_center(center[x, y])
+            time.sleep(0.005)
             #tof.start_ranging()
             dataReady = 0
             while dataReady == 0:
