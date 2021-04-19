@@ -29,7 +29,7 @@ tof.set_distance_mode(1)
 
 data = np.zeros((4, 4), dtype=np.uint16 )
 
-center = np.array([(149, 178, 210, 242), (149, 181, 213, 245), (110, 78, 46, 14), (106, 74, 42, 18)])
+center = np.array([(146, 178, 210, 241), (149, 181, 213, 245), (110, 78, 46, 14), (106, 74, 42, 18)])
 
 print("Center ROI")
 print(center)
