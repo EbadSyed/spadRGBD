@@ -563,17 +563,6 @@ class QwiicVL53L1X(object):
 		distance = self.__i2cRead(self.address,
 				VL53L1_RESULT__FINAL_CROSSTALK_CORRECTED_RANGE_MM_SD0, 2)
 
-		if(distance < 20):
-			distance = distance + 20
-		elif(distance < 30):
-			distance = distance + 17
-		elif(distance < 40):
-			distance = distance + 13
-		elif(distance < 100):
-			distance = distance + 8
-		elif(distance < 140):
-			distance = distance + 4
-
 		return distance
 
 
