@@ -32,7 +32,7 @@ from ServoKit import *
 from board import *
 import curses
 
-i2c = busio.I2C(SCL_1, SDA_1)
+i2c = busio.I2C(SCL, SDA)
 pca = PCA9685(i2c)
 pca.frequency = 50
 
