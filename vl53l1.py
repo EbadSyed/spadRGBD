@@ -15,8 +15,8 @@ from adafruit_pca9685 import PCA9685
 from ServoKit import *
 from board import *
 
-# file1 = open("data400.txt", "a")  
-  
+file1 = open("dataPoints.txt", "a")  
+
 i2c = busio.I2C(SCL, SDA)
 pca = PCA9685(i2c)
 pca.frequency = 50
@@ -75,8 +75,8 @@ plt.colorbar(fraction=0.1, pad=0.04)
 dataReady = 0
 
 # Scan the values by setting values for Phi and Theta
-for phi in range(60,125,15):
-    for theta in range(65,135,15):
+for phi in range(75,125,15):
+    for theta in range(65,100,15):
         servoKit.setAngle(0,theta)
         servoKit.setAngle(1,phi)
         time.sleep(1)
@@ -94,17 +94,20 @@ for phi in range(60,125,15):
                 actPhi = servoKit.getAngle(1)
                 # Convert to xyz coordinate
                 y1 = int((p+offset[x,y])*math.sin(math.radians(vert[x,y]+actTheta))*math.sin(math.radians(horz[x,y]+actPhi))) 
-                x1 = int((p+offset[x,y])*math.sin(math.radians(vert[x,y]+actTheta))*math.cos(math.radians(horz[x,y]+actPhi)))
-                z1 = int((p+offset[x,y])*math.cos(math.radians(vert[x,y]+actTheta)))
+                x1 = int((p+offset[x,y])*math.sin(math.radians(vert[x,y]+actPhi))*math.cos(math.radians(horz[x,y]+actTheta)))
+                z1 = int((p+offset[x,y])*math.cos(math.radians(vert[x,y]+actPhi)))
                 data[x, y] = y1
                
                 pclB = np.array([x1,y1,z1])
                 pcl = np.vstack((pcl,pclB))
+                print("Horz",actTheta,"Vert",actPhi)
+                print("p1,x1,y1,z1",p+offset[x,y],x1,y1,z1)
+                dataString = str(x1) + "," + str(y1) + "," + str(z1)
+                file1.write(dataString)
                 # file1.write(",")
                 tof.clear_interrupt()
                 tof.stop_ranging()
-        # file1.write("\n")
-        print(data)
+                file1.write("\n")
         plt.imshow(data,vmin=0, vmax=600)
         plt.waitforbuttonpress(0.001)
                 
