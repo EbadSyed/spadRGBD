@@ -15,7 +15,7 @@ from adafruit_pca9685 import PCA9685
 from ServoKit import *
 from board import *
 
-# file1 = open("data400.txt", "a")  
+file1 = open("dataPoints.txt", "a")  
   
 i2c = busio.I2C(SCL, SDA)
 pca = PCA9685(i2c)
@@ -46,20 +46,9 @@ tof.set_distance_mode(1)
 data = np.zeros((4, 4),dtype=np.int32)
 pcl = np.array([0,0,0])
 
-# ROI Center Value
-center = np.array([(145, 177, 209, 241), (149, 181, 213, 245), (110, 78, 46, 14), (106, 74, 42, 10)])
-
-# Angle values for ROI
-vert = np.array([(-22,-22,-22,-22),(-15,-15,-15,-15),(15,15,15,15),(22,22,22,22)])
-horz = np.array([(-22,-15,15,22),(-22,-15,15,22),(-22,-15,15,22),(-22,-15,15,22)])
-
 # Offset Values for ROI
-offset = np.array([(17,26,23,27),(30,48,45,22),(29,45,40,19),(24,25,19,17)])
-
-# phi = 90
-# theta = 90
-
-# tof.set_roi_center()
+#offset = np.array([(17,26,23,27),(30,48,45,22),(29,45,40,19),(24,25,19,17)])
+offset = 40
 
 # Set ROI Size
 tof.set_roi_size(4, 4)
@@ -68,48 +57,39 @@ tof.set_timing_budget_in_ms(50)
 # Intermeasurement period must be >/= timing budget
 tof.set_inter_measurement_in_ms(52)
 
-# Initialize Plot
-plt.imshow(data,vmin=0, vmax=600)
-plt.colorbar(fraction=0.1, pad=0.04)
 
 dataReady = 0
 
 # Scan the values by setting values for Phi and Theta
-for phi in range(60,125,15):
-    for theta in range(65,135,15):
+for phi in range(60,130,5):
+    for theta in range(70,120,5):
         servoKit.setAngle(0,theta)
         servoKit.setAngle(1,phi)
         time.sleep(1)
         # Scan the complete roi
-        for x in range(4):
-            for y in range(4):
-                tof.set_roi_center(center[x, y])
-                tof.start_ranging()
-                while dataReady == 0:
-                    dataReady = tof.check_for_data_ready()
-                dataReady = 0
-                p = tof.get_distance()
-                # Get the actual angle
-                actTheta = servoKit.getAngle(0)
-                actPhi = servoKit.getAngle(1)
-                # Convert to xyz coordinate
-                y1 = int((p+offset[x,y])*math.sin(math.radians(vert[x,y]+actTheta))*math.sin(math.radians(horz[x,y]+actPhi))) 
-                x1 = int((p+offset[x,y])*math.sin(math.radians(vert[x,y]+actTheta))*math.cos(math.radians(horz[x,y]+actPhi)))
-                z1 = int((p+offset[x,y])*math.cos(math.radians(vert[x,y]+actTheta)))
-                data[x, y] = y1
-               
-                pclB = np.array([x1,y1,z1])
-                pcl = np.vstack((pcl,pclB))
-                # file1.write(",")
-                tof.clear_interrupt()
-                tof.stop_ranging()
-        # file1.write("\n")
-        print(data)
-        plt.imshow(data,vmin=0, vmax=600)
-        plt.waitforbuttonpress(0.001)
-                
-plt.close()
-
+        tof.start_ranging()
+        while dataReady == 0:
+            dataReady = tof.check_for_data_ready()
+        dataReady = 0
+        p = tof.get_distance()
+        # Get the actual angle
+        actTheta = servoKit.getAngle(0)
+        actPhi = servoKit.getAngle(1)
+        # Convert to xyz coordinate
+        y1 = int((p+offset)*math.sin(math.radians(actTheta))*math.sin(math.radians(actPhi))) 
+        x1 = int((p+offset)*math.sin(math.radians(actPhi))*math.cos(math.radians(actTheta)))
+        z1 = int((p+offset)*math.cos(math.radians(actPhi)))
+        
+        print("Horz",actTheta,"Vert",actPhi)
+        print("p1,x1,y1,z1",p+offset,x1,y1,z1)       
+        pclB = np.array([x1,y1,z1])
+        pcl = np.vstack((pcl,pclB))
+        dataString = str(x1) + "," + str(y1) + "," + str(z1)
+        file1.write(dataString)
+        tof.clear_interrupt()
+        tof.stop_ranging()
+        file1.write("\n")
+        
 ax = plt.axes(projection='3d')
 ax.scatter(pcl[:,0], pcl[:,1], pcl[:,2],c='r', marker='o')
 ax.set_xlabel('X Label')
