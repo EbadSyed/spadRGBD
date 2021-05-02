@@ -15,7 +15,7 @@ from adafruit_pca9685 import PCA9685
 from ServoKit import *
 from board import *
 
-file1 = open("dataPoints.txt", "a")  
+file1 = open("dataPoints4.txt", "a")  
 
 i2c = busio.I2C(SCL, SDA)
 pca = PCA9685(i2c)
@@ -76,7 +76,7 @@ dataReady = 0
 
 # Scan the values by setting values for Phi and Theta
 for phi in range(75,125,15):
-    for theta in range(65,100,15):
+    for theta in range(65,140,15):
         servoKit.setAngle(0,theta)
         servoKit.setAngle(1,phi)
         time.sleep(1)
