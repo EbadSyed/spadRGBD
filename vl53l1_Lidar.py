@@ -27,7 +27,7 @@ signal.signal(signal.SIGINT, exit_handler)
 # Sets Distance Mode Short=1 Long=2
 tof.set_distance_mode(1)
 
-data = np.zeros((4, 4), dtype=np.uint16 )
+data = np.zeros((4, 4), dtype=np.uint32 )
 
 center = np.array([(145, 177, 209, 241), (149, 181, 213, 245), (110, 78, 46, 14), (106, 74, 42, 10)])
 
@@ -43,7 +43,7 @@ tof.set_timing_budget_in_ms(50)
 tof.set_inter_measurement_in_ms(51)
 
 # verify roi
-# for ytest in range(4):
+# for ytest in range(4):d
 #     for xtest in range(4):
 #         print(center[xtest, ytest])
 #         print(tof.set_roi_center(center[xtest, ytest]))
@@ -51,7 +51,7 @@ tof.set_inter_measurement_in_ms(51)
 
 
 fig = plt.figure()
-im = plt.imshow(data , vmin=0, vmax=1000)
+im = plt.imshow(data , vmin=0, vmax=600)
 plt.colorbar(fraction=0.1, pad=0.04)
 
 
