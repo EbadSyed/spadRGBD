@@ -15,7 +15,7 @@ from adafruit_pca9685 import PCA9685
 from ServoKit import *
 from board import *
 
-file1 = open("dataPoints4.txt", "a")  
+file1 = open("dataPoints7.txt", "a")  
 
 i2c = busio.I2C(SCL, SDA)
 pca = PCA9685(i2c)
@@ -43,18 +43,18 @@ signal.signal(signal.SIGINT, exit_handler)
 tof.set_distance_mode(1)
 
 # Create an empty array for data
-data = np.zeros((4, 4),dtype=np.int32)
+data = np.zeros((13, 13))
 pcl = np.array([0,0,0])
 
 # ROI Center Value
-center = np.array([(145, 177, 209, 241), (149, 181, 213, 245), (110, 78, 46, 14), (106, 74, 42, 10)])
+center = np.array([(145, 153, 161, 169 , 177, 185, 193, 201, 209, 217, 225, 233,  241),(146,154,162,170,178,186,194,202,210,218,226,234,242),(147,155,163,171,179,187,195,203,211,219,227,235,243),(148,156,164,172,180,188,196,204,212,220,228,236,244), (149, 157, 165 , 173, 181, 189, 197, 205, 213, 221, 229, 237, 245),(150,158,166,174,182,190,198,206,214,222,230,238,246),(151,159,167,175,183,191,199,207,215,223,231,239,247),(111,103,95,87,79,71,63,55,47,39,31,23,15), (110, 102, 94, 86, 78, 70, 62, 54, 46, 38, 30, 22, 14),(109,101,93,85,77,69,61,53,45,37,29,21,13),(108,100,92,84,76,68,60,52,44,36,28,20,12),(107,99,91,83,75,67,59,51,43,35,27,19,11), (106, 98, 90, 82, 74, 66, 58, 50, 42, 34, 26, 18, 10)])
 
 # Angle values for ROI
-vert = np.array([(-22,-22,-22,-22),(-15,-15,-15,-15),(15,15,15,15),(22,22,22,22)])
-horz = np.array([(-22,-15,15,22),(-22,-15,15,22),(-22,-15,15,22),(-22,-15,15,22)])
+vert = np.array([(-22,-22,-22,-22,-22,-22,-22,-22,-22,-22,-22,-22,-22),(-19,-19,-19,-19,-19,-19,-19,-19,-19,-19,-19,-19,-19),(-15,-15,-15,-15,-15,-15,-15,-15,-15,-15,-15,-15,-15),(-11,-11,-11,-11,-11,-11,-11,-11,-11,-11,-11,-11,-11),(-8,-8,-8,-8,-8,-8,-8,-8,-8,-8,-8,-8,-8),( -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4),( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),( 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4),(8,8,8,8,8,8,8,8,8,8,8,8,8),(11,11,11,11,11,11,11,11,11,11,11,11,11),(15,15,15,15,15,15,15,15,15,15,15,15,15),(19,19,19,19,19,19,19,19,19,19,19,19,19),(22,22,22,22,22,22,22,22,22,22,22,22,22)])
+horz = np.array([(-22,-19,-15,-11,-8,-4,0,4,8,11,15,19,22),(-22,-19,-15,-11,-8,-4,0,4,8,11,15,19,22),(-22,-19,-15,-11,-8,-4,0,4,8,11,15,19,22),(-22,-19,-15,-11,-8,-4,0,4,8,11,15,19,22),(-22,-19,-15,-11,-8,-4,0,4,8,11,15,19,22),(-22,-19,-15,-11,-8,-4,0,4,8,11,15,19,22),(-22,-19,-15,-11,-8,-4,0,4,8,11,15,19,22),(-22,-19,-15,-11,-8,-4,0,4,8,11,15,19,22),(-22,-19,-15,-11,-8,-4,0,4,8,11,15,19,22),(-22,-19,-15,-11,-8,-4,0,4,8,11,15,19,22),(-22,-19,-15,-11,-8,-4,0,4,8,11,15,19,22),(-22,-19,-15,-11,-8,-4,0,4,8,11,15,19,22),(-22,-19,-15,-11,-8,-4,0,4,8,11,15,19,22)])
 
 # Offset Values for ROI
-offset = np.array([(17,26,23,27),(30,48,45,22),(29,45,40,19),(24,25,19,17)])
+offset = np.array([(17,20,23,25,28,29,30,29,28,25,23,20,17),(17,20,23,25,28,29,30,29,28,25,23,20,17),(17,20,23,25,28,29,30,29,28,25,23,20,17),(17,20,23,25,28,29,30,29,28,25,23,20,17),(17,20,23,25,28,29,30,29,28,25,23,20,17),(17,20,23,25,28,29,30,29,28,25,23,20,17),(17,20,23,25,28,29,30,29,28,25,23,20,17),(17,20,23,25,28,29,30,29,28,25,23,20,17),(17,20,23,25,28,29,30,29,28,25,23,20,17),(17,20,23,25,28,29,30,29,28,25,23,20,17),(17,20,23,25,28,29,30,29,28,25,23,20,17),(17,20,23,25,28,29,30,29,28,25,23,20,17),(17,20,23,25,28,29,30,29,28,25,23,20,17)])
 
 # phi = 90
 # theta = 90
@@ -75,41 +75,46 @@ plt.colorbar(fraction=0.1, pad=0.04)
 dataReady = 0
 
 # Scan the values by setting values for Phi and Theta
-for phi in range(75,125,15):
+for phi in range(50,125,15):
     for theta in range(65,140,15):
         servoKit.setAngle(0,theta)
         servoKit.setAngle(1,phi)
         time.sleep(1)
         # Scan the complete roi
-        for x in range(4):
-            for y in range(4):
+        for x in range(13):
+            for y in range(13):
                 tof.set_roi_center(center[x, y])
+            
                 tof.start_ranging()
                 while dataReady == 0:
                     dataReady = tof.check_for_data_ready()
                 dataReady = 0
                 p = tof.get_distance()
+                
                 # Get the actual angle
                 actTheta = servoKit.getAngle(0)
                 actPhi = servoKit.getAngle(1)
                 # Convert to xyz coordinate
-                y1 = int((p+offset[x,y])*math.sin(math.radians(vert[x,y]+actTheta))*math.sin(math.radians(horz[x,y]+actPhi))) 
+                y1 = int((p+offset[x,y])*math.sin(math.radians(vert[x,y]+actPhi))*math.sin(math.radians(horz[x,y]+actTheta))) 
                 x1 = int((p+offset[x,y])*math.sin(math.radians(vert[x,y]+actPhi))*math.cos(math.radians(horz[x,y]+actTheta)))
                 z1 = int((p+offset[x,y])*math.cos(math.radians(vert[x,y]+actPhi)))
                 data[x, y] = y1
                
                 pclB = np.array([x1,y1,z1])
                 pcl = np.vstack((pcl,pclB))
-                print("Horz",actTheta,"Vert",actPhi)
-                print("p1,x1,y1,z1",p+offset[x,y],x1,y1,z1)
+                #print("Horz",actTheta,"Vert",actPhi)
+                #print("p1,x1,y1,z1",p+offset[x,y],x1,y1,z1)
                 dataString = str(x1) + "," + str(y1) + "," + str(z1)
                 file1.write(dataString)
                 # file1.write(",")
                 tof.clear_interrupt()
                 tof.stop_ranging()
+              
                 file1.write("\n")
         plt.imshow(data,vmin=0, vmax=600)
-        plt.waitforbuttonpress(0.001)
+        print(data)
+        plt.waitforbuttonpress(0.01)
+        
                 
 plt.close()
 
