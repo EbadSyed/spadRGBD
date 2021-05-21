@@ -15,7 +15,7 @@ from adafruit_pca9685 import PCA9685
 from ServoKit import *
 from board import *
 
-file1 = open("dataPoints4.txt", "a")  
+file1 = open("dataPoints6.txt", "a")  
   
 i2c = busio.I2C(SCL, SDA)
 pca = PCA9685(i2c)
