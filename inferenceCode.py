@@ -26,7 +26,7 @@ from PIL import Image
 
 import dataloaders.transforms as transforms
 
-rgbdMode = False
+rgbdMode = True
 
 points = 8
 
