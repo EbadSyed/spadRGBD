@@ -298,9 +298,6 @@ def validate(val_loader, model, epoch, write_to_file=True):
                 # plt.waitforbuttonpress(timeout=2)
                 # plt.close()
 
-                plt.waitforbuttonpress()
-                plt.close()
-
             if args.modality == 'rgbd':
                 # sparse = np.squeeze(input[:, 3:, :, :].cpu().numpy())
                 # print(sparse.shape)
@@ -335,12 +332,10 @@ def validate(val_loader, model, epoch, write_to_file=True):
                 plt.imshow(np.squeeze(pred.cpu().numpy()), interpolation='nearest')
                 plt.colorbar(fraction=0.1, pad=0.04)
 
-                # plt.waitforbuttonpress(timeout=2)
-                # plt.close()
-
-                plt.waitforbuttonpress()
+                plt.waitforbuttonpress(timeout=2)
                 plt.close()
-#
+
+
         # save 8 images for visualization
         skip = 50
         if args.modality == 'd':
