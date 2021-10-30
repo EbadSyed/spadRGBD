@@ -28,12 +28,14 @@ import dataloaders.transforms as transforms
 
 rgbdMode = False
 
+points = 8
+
 path1 = '/home/ebad/spadRGBD/data/nyudepthv2/train/cafe_0001a/00001.h5'
 
 if rgbdMode:
-    model_path = '/home/ebad/spadRGBD/results/rgbd20/model_best.pth.tar'
+    model_path = '/home/ebad/spadRGBD/results/rgbd8/model_best.pth.tar'
 else:
-    model_path = '/home/ebad/spadRGBD/results/d20/model_best.pth.tar'
+    model_path = '/home/ebad/spadRGBD/results/d8/model_best.pth.tar'
 
 
 iheight, iwidth = 480, 640  # raw image size
@@ -59,20 +61,20 @@ def dense_to_sparse(depth):
     If no `max_depth` is given, samples in all pixels
     """
 
-    vert = int(depth.shape[0] / 4)
-    horz = int(depth.shape[1] / 4)
+    vert = int(depth.shape[0] / points)
+    horz = int(depth.shape[1] / points)
 
-    if vert%2 != 0:
-        vert = vert - 1
-    if horz%2 != 0:
-        horz = horz - 1
-    print("Vertical",vert)
-    print("Horizontal", horz)
+    # if vert%2 != 0:
+    #     vert = vert - 1
+    # if horz%2 != 0:
+    #     horz = horz - 1
+    # print("Vertical",vert)
+    # print("Horizontal", horz)
     sparse_array = np.zeros(depth.shape)
 
-    for x in range(4):
-        for y in range(4):
-            print(x,y)
+    for x in range(points):
+        for y in range(points):
+            # print(x,y)
             sparse_array[int(((x + 1) * vert) - vert/2), int(((y + 1) * horz) - horz/2)] = depth[int(((x + 1) * vert) - vert/2), int(((y + 1) * horz)/2)]
 
     return sparse_array
@@ -113,6 +115,9 @@ rgb2, depth2 = val_transform(rgb1, depth1)
 
 depth_sparse = dense_to_sparse(depth2)
 
+plt.figure()
+plt.imshow(depth_sparse)
+
 rgbd = create_rgbd(rgb2, depth2)
 
 input_tensor = to_tensor(rgbd)
@@ -134,6 +139,7 @@ with torch.no_grad():
 
 torch.cuda.synchronize()
 
+print("Pred Shape", pred.shape)
 plt.figure()
 plt.imshow(np.squeeze(pred.cpu().numpy()), interpolation='nearest')
 plt.colorbar(fraction=0.1, pad=0.04)

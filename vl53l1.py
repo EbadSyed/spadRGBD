@@ -46,6 +46,7 @@ tof.set_distance_mode(1)
 data = np.zeros((13, 13))
 pcl = np.array([0,0,0])
 
+
 # ROI Center Value
 center = np.array([(145, 153, 161, 169 , 177, 185, 193, 201, 209, 217, 225, 233,  241),(146,154,162,170,178,186,194,202,210,218,226,234,242),(147,155,163,171,179,187,195,203,211,219,227,235,243),(148,156,164,172,180,188,196,204,212,220,228,236,244), (149, 157, 165 , 173, 181, 189, 197, 205, 213, 221, 229, 237, 245),(150,158,166,174,182,190,198,206,214,222,230,238,246),(151,159,167,175,183,191,199,207,215,223,231,239,247),(111,103,95,87,79,71,63,55,47,39,31,23,15), (110, 102, 94, 86, 78, 70, 62, 54, 46, 38, 30, 22, 14),(109,101,93,85,77,69,61,53,45,37,29,21,13),(108,100,92,84,76,68,60,52,44,36,28,20,12),(107,99,91,83,75,67,59,51,43,35,27,19,11), (106, 98, 90, 82, 74, 66, 58, 50, 42, 34, 26, 18, 10)])
 
@@ -68,9 +69,6 @@ tof.set_timing_budget_in_ms(50)
 # Intermeasurement period must be >/= timing budget
 tof.set_inter_measurement_in_ms(52)
 
-# Initialize Plot
-plt.imshow(data,vmin=0, vmax=600)
-plt.colorbar(fraction=0.1, pad=0.04)
 
 dataReady = 0
 
@@ -81,43 +79,30 @@ for phi in range(50,125,15):
         servoKit.setAngle(1,phi)
         time.sleep(1)
         # Scan the complete roi
-        for x in range(13):
-            for y in range(13):
-                tof.set_roi_center(center[x, y])
-            
-                tof.start_ranging()
-                while dataReady == 0:
-                    dataReady = tof.check_for_data_ready()
-                dataReady = 0
-                p = tof.get_distance()
-                
-                # Get the actual angle
-                actTheta = servoKit.getAngle(0)
-                actPhi = servoKit.getAngle(1)
-                # Convert to xyz coordinate
-                y1 = int((p+offset[x,y])*math.sin(math.radians(vert[x,y]+actPhi))*math.sin(math.radians(horz[x,y]+actTheta))) 
-                x1 = int((p+offset[x,y])*math.sin(math.radians(vert[x,y]+actPhi))*math.cos(math.radians(horz[x,y]+actTheta)))
-                z1 = int((p+offset[x,y])*math.cos(math.radians(vert[x,y]+actPhi)))
-                data[x, y] = y1
-               
-                pclB = np.array([x1,y1,z1])
-                pcl = np.vstack((pcl,pclB))
-                #print("Horz",actTheta,"Vert",actPhi)
-                #print("p1,x1,y1,z1",p+offset[x,y],x1,y1,z1)
-                dataString = str(x1) + "," + str(y1) + "," + str(z1)
-                file1.write(dataString)
-                # file1.write(",")
-                tof.clear_interrupt()
-                tof.stop_ranging()
-              
-                file1.write("\n")
-        plt.imshow(data,vmin=0, vmax=600)
-        print(data)
-        plt.waitforbuttonpress(0.01)
-        
-                
-plt.close()
 
+        tof.start_ranging()
+        while dataReady == 0:
+            dataReady = tof.check_for_data_ready()
+        dataReady = 0
+        p = tof.get_distance()
+        # Get the actual angle
+        actTheta = servoKit.getAngle(0)
+        actPhi = servoKit.getAngle(1)
+        # Convert to xyz coordinate
+        y1 = int((p+offset)*math.sin(math.radians(actTheta))*math.sin(math.radians(actPhi))) 
+        x1 = int((p+offset)*math.sin(math.radians(actPhi))*math.cos(math.radians(actTheta)))
+        z1 = int((p+offset)*math.cos(math.radians(actPhi)))
+        
+        print("Horz",actTheta,"Vert",actPhi)
+        print("p1,x1,y1,z1",p+offset,x1,y1,z1)       
+        pclB = np.array([x1,y1,z1])
+        pcl = np.vstack((pcl,pclB))
+        dataString = str(x1) + "," + str(y1) + "," + str(z1)
+        file1.write(dataString)
+        tof.clear_interrupt()
+        tof.stop_ranging()
+        file1.write("\n")
+        
 ax = plt.axes(projection='3d')
 ax.scatter(pcl[:,0], pcl[:,1], pcl[:,2],c='r', marker='o')
 ax.set_xlabel('X Label')
