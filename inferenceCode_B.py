@@ -1,48 +1,23 @@
+import tvm
+from tvm import relay
+
+import h5py
+
 import os
-import time
-import csv
 import numpy as np
 
 import torch
-import torch.backends.cudnn as cudnn
-import torch.optim
-
-from models import ResNet
-from metrics import AverageMeter, Result
-from dataloaders.dense_to_sparse import UniformSampling, SimulatedStereo
-import criteria
-import utils
-import h5py
-
-import skimage.io as io
-# import matplotlib.pyplot as plt
-
-import matplotlib
-
-matplotlib.use('TkAgg')
-import matplotlib.pyplot as plt
-
-from PIL import Image
+import torchvision
 
 import dataloaders.transforms as transforms
 
-rgbdMode = False
-
-points = 8
-
 path1 = '/home/ebad/spadRGBD/data/nyudepthv2/train/cafe_0001a/00001.h5'
-
-if rgbdMode:
-    model_path = '/home/ebad/spadRGBD/results/rgbd8/model_best.pth.tar'
-else:
-    model_path = '/home/ebad/spadRGBD/results/d8/model_best.pth.tar'
-
+model_path = '/home/ebad/spadRGBD/results/d8/model_best.pth.tar'
 
 iheight, iwidth = 480, 640  # raw image size
 output_size = (228, 304)
 
 to_tensor = transforms.ToTensor()
-
 
 def h5_loader(path):
     h5f = h5py.File(path, "r")
@@ -64,12 +39,6 @@ def dense_to_sparse(depth):
     vert = int(depth.shape[0] / points)
     horz = int(depth.shape[1] / points)
 
-    # if vert%2 != 0:
-    #     vert = vert - 1
-    # if horz%2 != 0:
-    #     horz = horz - 1
-    # print("Vertical",vert)
-    # print("Horizontal", horz)
     sparse_array = np.zeros(depth.shape)
 
     for x in range(points):
@@ -98,25 +67,14 @@ def create_rgbd(rgb, depth):
     rgbd = np.append(rgb, np.expand_dims(sparse_depth, axis=2), axis=2)
     return rgbd
 
+points = 8
 
-assert os.path.isfile(model_path), "=> no best model found at '{}'".format(model_path)
-print("=> loading best model '{}'".format(model_path))
-checkpoint = torch.load(model_path)
-output_directory = os.path.dirname(model_path)
-args = checkpoint['args']
-start_epoch = checkpoint['epoch'] + 1
-best_result = checkpoint['best_result']
-model = checkpoint['model']
-print("=> loaded best model (epoch {})".format(checkpoint['epoch']))
 
 rgb1, depth1 = h5_loader(path1)
 
 rgb2, depth2 = val_transform(rgb1, depth1)
 
 depth_sparse = dense_to_sparse(depth2)
-
-plt.figure()
-plt.imshow(depth_sparse)
 
 rgbd = create_rgbd(rgb2, depth2)
 
@@ -127,33 +85,38 @@ depth_tensor = to_tensor(depth_sparse)
 depth_tensor = depth_tensor.unsqueeze(0)
 depth_tensor = depth_tensor.unsqueeze(0)
 
-if rgbdMode:
-    input = input_tensor.cuda()
-else:
-    input = depth_tensor.cuda()
+print("Input Tensor",input_tensor.shape)
+print("Depth Tensor",depth_tensor.shape)
 
-torch.cuda.synchronize()
 
-with torch.no_grad():
-    pred = model(input)
+scripted_model = torch.jit.load("/home/ebad/spadRGBD/modeld8_.pt")
 
-torch.cuda.synchronize()
+input_name = "input"
+shape_list = [(input_name, depth_tensor.shape)]
+mod, params = relay.frontend.from_pytorch(scripted_model, shape_list)
 
-print("Pred Shape", pred.shape)
+target = tvm.target.Target("cuda", host="llvm")
+
+dev = tvm.cuda(0)
+with tvm.transform.PassContext(opt_level=3):
+    lib = relay.build(mod, target=target, params=params)
+
+from tvm.contrib import graph_executor
+
+dtype = "float32"
+m = graph_executor.GraphModule(lib["default"](dev))
+# Set inputs
+m.set_input(input_name, depth_tensor)
+# Execute
+m.run()
+# Get outputs
+tvm_output = m.get_output(0)
+
+import matplotlib
+
+matplotlib.use('TkAgg')
+import matplotlib.pyplot as plt
+
 plt.figure()
-plt.imshow(np.squeeze(pred.cpu().numpy()), interpolation='nearest')
-plt.colorbar(fraction=0.1, pad=0.04)
-
-plt.figure()
-plt.imshow(depth2)
-
+plt.imshow(np.squeeze(tvm_output.numpy()),interpolation='nearest')
 plt.show()
-
-# plt.figure()
-# plt.imshow(rgb2)
-#
-#
-# plt.figure()
-# plt.imshow(depth_sparse)
-#
-# plt.show()
