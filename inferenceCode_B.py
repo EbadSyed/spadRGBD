@@ -112,6 +112,10 @@ m.run()
 # Get outputs
 tvm_output = m.get_output(0)
 
+ftimer = m.module.time_evaluator("run", dev, repeat=10)
+prof_res = np.array(ftimer().results) * 1e3  # convert to millisecond
+print("Mean inference time (std dev): %.2f ms (%.2f ms)" % (np.mean(prof_res), np.std(prof_res)))
+
 import matplotlib
 
 matplotlib.use('TkAgg')

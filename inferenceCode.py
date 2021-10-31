@@ -132,12 +132,17 @@ if rgbdMode:
 else:
     input = depth_tensor.cuda()
 
-torch.cuda.synchronize()
+for x in range(10):
+    time1 = time.time()
+    torch.cuda.synchronize()
 
-with torch.no_grad():
-    pred = model(input)
+    with torch.no_grad():
+        pred = model(input)
 
-torch.cuda.synchronize()
+    torch.cuda.synchronize()
+    time2 = time.time()
+
+    print("Time",time2-time1)
 
 print("Pred Shape", pred.shape)
 plt.figure()
