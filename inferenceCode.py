@@ -26,16 +26,16 @@ from PIL import Image
 
 import dataloaders.transforms as transforms
 
-rgbdMode = False
+rgbdMode = True
 
 points = 8
 
-path1 = '/home/ebad/spadRGBD/data/nyudepthv2/train/cafe_0001a/00001.h5'
+path1 = '/home/ebad/spadRGBD/data/nyudepthv2/val/official/00001.h5'
 
 if rgbdMode:
     model_path = '/home/ebad/spadRGBD/results/rgbd8/model_best.pth.tar'
 else:
-    model_path = '/home/ebad/spadRGBD/results/d8/model_best.pth.tar'
+    model_path = '/home/ebad/spadRGBD/results/d40/model_best.pth.tar'
 
 
 iheight, iwidth = 480, 640  # raw image size
@@ -61,8 +61,10 @@ def dense_to_sparse(depth):
     If no `max_depth` is given, samples in all pixels
     """
 
-    vert = int(depth.shape[0] / points)
-    horz = int(depth.shape[1] / points)
+    print("Vert",depth.shape[0])
+    print("Horz",depth.shape[1])
+    vert = depth.shape[0] / points
+    horz = depth.shape[1] / points
 
     # if vert%2 != 0:
     #     vert = vert - 1
@@ -75,7 +77,7 @@ def dense_to_sparse(depth):
     for x in range(points):
         for y in range(points):
             # print(x,y)
-            sparse_array[int(((x + 1) * vert) - vert/2), int(((y + 1) * horz) - horz/2)] = depth[int(((x + 1) * vert) - vert/2), int(((y + 1) * horz)/2)]
+            sparse_array[int(((x+1)*vert)-1), int(((y + 1) * horz)-1)] = depth[int(((x + 1) * vert)-1), int(((y + 1) * horz)-1)]
 
     return sparse_array
 
@@ -121,11 +123,17 @@ plt.imshow(depth_sparse)
 rgbd = create_rgbd(rgb2, depth2)
 
 input_tensor = to_tensor(rgbd)
+print("Input Sensor",input_tensor.shape)
 input_tensor = input_tensor.unsqueeze(0)
+print("Input Sensor",input_tensor.shape)
 
 depth_tensor = to_tensor(depth_sparse)
+print("Depth Sensor",depth_tensor.shape)
 depth_tensor = depth_tensor.unsqueeze(0)
+print("Depth Sensor",depth_tensor.shape)
 depth_tensor = depth_tensor.unsqueeze(0)
+
+print("Depth Sensor",depth_tensor.shape)
 
 if rgbdMode:
     input = input_tensor.cuda()
@@ -142,7 +150,7 @@ for x in range(10):
     torch.cuda.synchronize()
     time2 = time.time()
 
-    print("Time",time2-time1)
+    print("Time",(time2-time1)*1000)
 
 print("Pred Shape", pred.shape)
 plt.figure()

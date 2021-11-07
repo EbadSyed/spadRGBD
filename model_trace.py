@@ -12,7 +12,7 @@ import torchvision
 import dataloaders.transforms as transforms
 
 path1 = '/home/ebad/spadRGBD/data/nyudepthv2/train/cafe_0001a/00001.h5'
-model_path = '/home/ebad/spadRGBD/results/d8/model_best.pth.tar'
+model_path = '/home/ebad/spadRGBD/results/rgbd40/model_best.pth.tar'
 
 iheight, iwidth = 480, 640  # raw image size
 output_size = (228, 304)
@@ -35,6 +35,8 @@ def dense_to_sparse(depth):
     Only pixels with a maximum depth of `max_depth` are considered.
     If no `max_depth` is given, samples in all pixels
     """
+
+    print("Points",points)
 
     vert = int(depth.shape[0] / points)
     horz = int(depth.shape[1] / points)
@@ -73,7 +75,7 @@ def create_rgbd(rgb, depth):
     rgbd = np.append(rgb, np.expand_dims(sparse_depth, axis=2), axis=2)
     return rgbd
 
-points = 8
+points = 40
 
 assert os.path.isfile(model_path), "=> no best model found at '{}'".format(model_path)
 print("=> loading best model '{}'".format(model_path))
@@ -103,13 +105,11 @@ depth_tensor = depth_tensor.unsqueeze(0)
 print("Input Tensor",input_tensor.shape)
 print("Depth Tensor",depth_tensor.shape)
 
-# scripted_model = torch.jit.trace(model.eval(), input_tensor).eval()
+
 model = model.eval()
-
-torch.save(model.state_dict(), "/home/ebad/spadRGBD/modelrgbd8.pt")
-
-scripted_model = torch.jit.trace(model, depth_tensor.cuda()).eval()
+scripted_model = torch.jit.trace(model, input_tensor.cuda()).eval()
 
 print(scripted_model.graph)
 
-torch.jit.save(scripted_model,"/home/ebad/spadRGBD/modeld8_.pt")
+
+torch.jit.save(scripted_model,"/home/ebad/spadRGBD/modelrgbd40.pt")
